@@ -1,9 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
-        <loc>
-            http://ianbishop.github.com/blog/2013/01/13/escape-from-callback-hell-a-survivors-retrospective/
-        </loc>
+        <loc>http://ianbishop.github.com/blog/2013/01/13/escape-from-callback-hell/</loc>
         <lastmod>2013-03-02T18:21:56-04:00</lastmod>
     </url>
     <url>
