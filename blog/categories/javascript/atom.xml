@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: javascript | Ian Bishop]]></title>
+  <link href="http://ianbishop.github.com/blog/categories/javascript/atom.xml" rel="self"/>
+  <link href="http://ianbishop.github.com/"/>
+  <updated>2013-03-02T18:22:13-04:00</updated>
+  <id>http://ianbishop.github.com/</id>
+  <author>
+    <name><![CDATA[Ian Bishop]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Escape from Callback Hell]]></title>
+    <link href="http://ianbishop.github.com/blog/2013/01/13/escape-from-callback-hell-a-survivors-retrospective/"/>
+    <updated>2013-01-13T12:52:00-04:00</updated>
+    <id>http://ianbishop.github.com/blog/2013/01/13/escape-from-callback-hell-a-survivors-retrospective</id>
+    <content type="html"><![CDATA[<p><img src="http://www.storminforms.com/wp-content/uploads/2010/11/Escape_from_New_York_1920x1080.jpg" alt="Be this guy." /></p>
+
+<h2>Brief Intro</h2>
+
+<p>In 2009, I was working as a student for a small consulting firm, tasked to develop some real-time visualization stuff for the web.</p>
+
+<p>Normally, this would have meant writing some Flash. But it was 2009, so <em>Flash Is Dead</em> and <em>HTML5 Is King</em>.</p>
+
+<p>It was the first project I would work on where Javascript would make up the meat of the work, rather than just "sprinkling some jQuery on it" -- another thing people said back then.</p>
+
+<p>Over the next 8 months, I travelled down the path of re-learning Javascript. It's likely a path many of you are familiar with.</p>
+
+<p>At first, I tried to make everything object-oriented. Then, oh god, so much global state. I sat there, puzzled, googling desperately:</p>
+
+<p><img src="http://i.imgur.com/4ZiXUqN.png" alt="Don't be this guy." /></p>
+
+<p>I eventually realized that I was among the many who never became familiar with the slumbering beast in our browsers, soon to be awoken to bring on the next generation of the web.</p>
+
+<p>Despite this enlightenment, something kept coming back to haunt every project I worked on. See, the difficulty was not using the new shiny HTML5 canvas APIs to draw spinning circles, but rather, it was this pesky <em>AJAX</em> thing.</p>
+
+<p>Infact, it was the <strong><em>A</em></strong> in particlar.</p>
+
+<h2>A (for Asynchronous)</h2>
+
+<p>``` javascript</p>
+
+<p>function getItem(id) {
+  return $.get('/api/item/' + id);
+}
+```</p>
+
+<p>This is genuinely how I expected things would work.</p>
+
+<p>But it isn't. Instead, we have <em>callbacks</em>. Mysterious functions which are called when our request completes (if ever) and passes the resulting data as arguments.</p>
+
+<p>That doesn't sound bad at all.</p>
+
+<p>``` javascript</p>
+
+<p>function displayItem (item) {
+  console.log(item);
+}</p>
+
+<p>function loadItem (id) {
+  $.get('/api/item/' + id, function(data) {</p>
+
+<pre><code>  displayItem(data);
+</code></pre>
+
+<p>  });
+}</p>
+
+<p>```</p>
+
+<h3>Callback Hell</h3>
+
+<p><a href="http://callbackhell.com/">Callback Hell</a> is the affectionate name given to what happens when you want to do a bunch of sequential things using these asynchronous functions.</p>
+
+<p>Let's use <a href="http://developer.echonest.com/docs/v4/">The Echo Nest</a> as our guinea pig. These guys are really cool and let you upload songs to be analyzed. With their analysis, you can create some <a href="http://drinkify.org/">really effing</a> <a href="http://labs.echonest.com/Uploader/index.html">amazing stuff</a>.</p>
+
+<p>But that doesn't necessarily look that cool or read that cool.</p>
+
+<p>``` javascript Remix.js https://github.com/echonest/remix.js/blob/master/remix.js
+$.getJSON(url, {id:trackID, api_key:apiKey}, function(data) {</p>
+
+<pre><code>var analysisURL = data.response.track.audio_summary.analysis_url;
+track = data.response.track;
+
+// This call is proxied through the yahoo query engine.
+// This is temporary, but works.
+$.getJSON("http://query.yahooapis.com/v1/public/yql",
+  { q: "select * from json where url=\"" + analysisURL + "\"", format: "json"},
+  function(data) {
+    if (data.query.results != null) {
+      track.analysis = data.query.results.json;
+      remixer.remixTrack(track, trackURL, callback);
+    }
+    else {
+      console.log('error', 'No analysis data returned:  sorry!');
+    }
+});
+</code></pre>
+
+<p> });
+```</p>
+
+<p>Everything is fun and games until you have callbacks calling callbacks calling callb...<a href="http://www.youtube.com/watch?v=s8S5PN1FnFk&amp;t=1m29s">backs on backs on backs</a>.</p>
+
+<h3>Deferral</h3>
+
+<p>Luckily, the Javascript community is filled with <a href="https://twitter.com/rmurphey">smart</a>, <a href="https://twitter.com/jaubourg">hardworking</a> people who make tools to fix these problems. In 2011, <a href="http://yayquery.com/">a group of people whom I respect dearly</a> were really excited to talk about how the antidote had arrived.</p>
+
+<p>Our Virgil is here, ready to guide us out of this place, and his name is <a href="https://github.com/jquery/jquery/commit/116c82b027a03a7a5670fa580fa9af819cc1cc03">$.Deferred</a>.</p>
+
+<h2>Breaking It Down</h2>
+
+<p>Promises are by no means a new idea. They were invented <a href="http://en.wikipedia.org/wiki/Futures_and_promises">back in the 1970s</a> by some really smart guys who were trying to figure out how to write programs that did more than one thing at a time. Even though Javascript is single threaded, promises prove to be extrodinarily useful for managing asynchronous calls.</p>
+
+<p>A promise is like saying that you're doing something and you don't know how long it will take but, when you're done, you promise you'll do some other stuff. In reality, it's much like me promising that I will remember to pick up some milk after work, except computers don't break promises.</p>
+
+<h3>Fulfilling a Promise</h3>
+
+<p>``` javascript Creating a Deferred Object
+function createAPromise() {
+  var dfd = $.Deferred();</p>
+
+<p>  return dfd.promise();
+}</p>
+
+<p>```</p>
+
+<p>As you can see, making a promise is pretty easy. Especially one like this, which doesn't do anything.</p>
+
+<p>``` javascript An (Updated) Example from Rebecca Murphey's "Deferreds Coming to jQuery 1.5?" http://rmurphey.com/blog/2010/12/25/deferreds-coming-to-jquery/</p>
+
+<p>function doIt() {
+  var dfd = $.Deferred();</p>
+
+<p>  setTimeout(function() {</p>
+
+<pre><code>dfd.resolve('hello world');
+</code></pre>
+
+<p>  }, 5000);</p>
+
+<p>  return dfd.promise();
+}</p>
+
+<p>```</p>
+
+<p>In this example, we can see that we now actually doing something asynchronous, namely waiting for 5s.</p>
+
+<p>The key though is that, once we're done waiting, we're going to call <code>dfd.resolve('hello world')</code>.</p>
+
+<p>By resolving the deferred object, we are fulfilling the promise we made. We can also use <code>reject</code> to say that we failed to fulfill the promise (computers sometimes forget to pick up milk, after all). Finally, we can also use <code>notify</code> to inform everyone how we are progressing.</p>
+
+<h3>Everything is Already a Promise</h3>
+
+<p>Anything that is done asychronously in jQuery is already re-written to return a promise.</p>
+
+<p>``` javascript Circa 2009 Looking Code</p>
+
+<p>function createItem(item, callback) {
+  $.post("/api/item", item, function(data) {</p>
+
+<pre><code>callback(data);
+</code></pre>
+
+<p>  });
+}</p>
+
+<p>```</p>
+
+<p>I used to write stuff like this a lot.</p>
+
+<p>Now you might be seeing stuff that looks a bit more like this:</p>
+
+<p><code>javascript
+function createItem(item, successCallback, errorCallback) {
+  var req = $.post("/api/item", item);
+  req.success(successCallback);
+  req.error(errorCallback);
+}
+</code></p>
+
+<p>This is better, it definitely makes it clearer what exactly is going on. The only magic here is what are these <code>success</code> and <code>error</code> things? It turns out that they are actually just deferreds.</p>
+
+<h3>Chaining Things Together</h3>
+
+<p>``` javascript Simple Chaining
+function displayError(message) {
+  console.log("ERROR! " + message);
+}</p>
+
+<p>function displayItem(item) {
+  console.log(item);
+}</p>
+
+<p>function getItem(id) {
+  return $.get("/api/item/" + id);
+}</p>
+
+<p>getItem(5).then(displayItem, displayError);</p>
+
+<p>```</p>
+
+<p>In this simple example, we can see that we are going to try and an item with <code>id = 5</code> and then either log the data (on success) or complain about errors (on error).</p>
+
+<h3>Working in Parallel</h3>
+
+<p>Let's say that you have a couple things you want to do at the same time and then maybe when they are both done you want to do something else.</p>
+
+<p>``` javascript Parallel using $.when
+function getItem(id) {
+  return $.get("/api/item/" + id);
+}</p>
+
+<p>$.when(getItem(3), getItem(4)).then(handleSuccess, handleFailure);
+```</p>
+
+<p><code>$.when</code> will create a wrapper deferred that tracks the results of each deferred. If any of the promises fail, it will call <code>reject</code> on the master promise, otherwise it will call <code>resolve</code>.</p>
+
+<p>There are many more functions at your disposal, check out the <a href="http://api.jquery.com/category/deferred-object/">$.Deferred documentation</a> for more information.</p>
+
+<h2 id="cookbook">Cooking with Deferreds</h2>
+
+
+<h3>Wait</h3>
+
+<p>I really like this helper function as it allows you to do deferred waits when you're doing stuff like long polling. I'm not sure who the credit for this belongs to, it might have been from an SO post or maybe I wrote it myself. If you know, please leave a comment with its source.</p>
+
+<p>``` javascript Wait
+$.wait = function(time) {
+  return $.Deferred(function(dfd) {</p>
+
+<pre><code>setTimeout(dfd.resolve, time);
+</code></pre>
+
+<p>  });
+};</p>
+
+<p>$.wait(5000).then(doSomething);
+```</p>
+
+<h3>Polling for Change</h3>
+
+<p>Sometimes you will have to do some polling, waiting to see if a delayed job has completed.</p>
+
+<p>The Echo Nest is a good example of this -- uploading a file, waiting for it to be analyzed and then getting that analysis when it's done.</p>
+
+<p>``` javascript Long Polling for Change
+var checkTrackStatus = function () {
+  return $.get('http://developer.echonest.com/api/v4/track/profile?format=json&amp;bucket=audio_summary',</p>
+
+<pre><code>          { 'api_key': r.apiKey, 'id', r.trackId });
+</code></pre>
+
+<p>};</p>
+
+<p>var checkTrackAnalyzed = function () {
+  return checkTrackStatus()</p>
+
+<pre><code>.then(function(data) {
+  var status = data["response"]["track"]["status"];
+
+  if (_.isEqual(status, "complete"))
+    return true;
+  else if (_.isEqual(status, "pending"))
+    return $.wait(2000).then(checkTrackStatus)
+  else
+    return false;
+});
+</code></pre>
+
+<p>};</p>
+
+<p>var attemptAnalyze = function () {
+  return uploadTrack().then(checkTrackAnalyzed, displayFailedToUpload);
+};
+```</p>
+
+<h3>Progress</h3>
+
+<p>In some situations, you might have the opportunity to provide feedback to the user on how something is doing. <code>.notify</code> makes this easy.</p>
+
+<p>``` javascript Progress with notify
+var displayTrackLoading = function (p) {
+  if (p == 100)</p>
+
+<pre><code>console.log("TRACK LOADED, REMIXIN'");
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>console.log("TRACK LOADING: " + p);
+</code></pre>
+
+<p>};</p>
+
+<p>var loadTrack = function () {
+  var dfd = $.Deferred();</p>
+
+<p>  dfd.progress(displayTrackLoading);</p>
+
+<p>  r.remixer.remixTrackById(r.trackId, r.trackUrl, function (t, p) {</p>
+
+<pre><code>dfd.notify(p);
+
+if (_.isEqual(t.status, "ok"))
+  return dfd.resolve(t);
+</code></pre>
+
+<p>  });</p>
+
+<p>  return dfd.promise();
+};
+```</p>
+
+<h3>Asynchronous Native Functions</h3>
+
+<p>There is some stuff in Javascript that are done asynchronously as well. We can reduce the number of brain cycles spent on serializing a file.</p>
+
+<p>``` javascript Serializing files</p>
+
+<p>var serializeFile = function(file) {
+  var dfd = $.Deferred();</p>
+
+<p>  var reader = new FileReader();
+  reader.onloadend = function() {</p>
+
+<pre><code>dfd.resolve({
+  name: file.name,
+  data: this.result
+});
+</code></pre>
+
+<p>  }</p>
+
+<p>  reader.readAsDataURL(raw);</p>
+
+<p>  return dfd.promise();
+};</p>
+
+<p>```</p>
+
+<p>That's pretty cool, but let's spice it up and grab a couple files at once.</p>
+
+<p>``` javascript Serializing multiple files
+$.when(serializeFile(file1), serializeFile(file2))
+  .then(function (encodedFile1, encodedFile2) {</p>
+
+<pre><code>console.log("File 1: " + encodedFile1);
+console.log("File 2: " + encodedFile2);
+</code></pre>
+
+<p>  });
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

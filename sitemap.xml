@@ -1,8 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
+        <loc>
+            http://ianbishop.github.com/blog/2013/01/13/escape-from-callback-hell-a-survivors-retrospective/
+        </loc>
+        <lastmod>2013-03-02T18:21:56-04:00</lastmod>
+    </url>
+    <url>
         <loc>http://ianbishop.github.com/</loc>
-        <lastmod>2013-01-13T11:46:53-04:00</lastmod>
+        <lastmod>2013-03-02T18:21:56-04:00</lastmod>
     </url>
     <url>
         <loc>http://ianbishop.github.com/robots.txt</loc>
@@ -10,6 +16,6 @@
     </url>
     <url>
         <loc>http://ianbishop.github.com/blog/archives/</loc>
-        <lastmod>2013-01-13T11:46:53-04:00</lastmod>
+        <lastmod>2013-03-02T18:21:56-04:00</lastmod>
     </url>
 </urlset>
