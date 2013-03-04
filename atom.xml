@@ -4,7 +4,7 @@
   <title><![CDATA[Ian Bishop]]></title>
   <link href="http://ianbishop.github.com/atom.xml" rel="self"/>
   <link href="http://ianbishop.github.com/"/>
-  <updated>2013-03-02T20:48:03-04:00</updated>
+  <updated>2013-03-04T12:41:33-04:00</updated>
   <id>http://ianbishop.github.com/</id>
   <author>
     <name><![CDATA[Ian Bishop]]></name>
@@ -12,6 +12,23 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[YellowAPI almost one year old]]></title>
+    <link href="http://ianbishop.github.com/blog/2013/03/04/yellowapi-almost-one-year-old/"/>
+    <updated>2013-03-04T12:36:00-04:00</updated>
+    <id>http://ianbishop.github.com/blog/2013/03/04/yellowapi-almost-one-year-old</id>
+    <content type="html"><![CDATA[<p>Nearly a year ago, I wrote a gem wrapper for the Yellow Pages <a href="https://github.com/ianbishop/yellow_api">Yellow API</a>.</p>
+
+<p>I had mostly forgotten about it, since no issues have been filed against it and no changes have happened to the API itself.</p>
+
+<p>But, I was happy to see when I check its <a href="http://rubygems.org/gems/yellow_api">RubyGems page</a> that it has had over 1,000 downloads in the last year.</p>
+
+<p>That sort of feedback (1K downloads and 0 issues?) definitely inspires me to keep on giving.</p>
+
+<p>Hurray for open source!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Escape from Callback Hell]]></title>
